@@ -1,17 +1,15 @@
-Dockerfile
 # Defining the base image 
 FROM node:20-alpine 
 
 # Create a working directory inside the container
 WORKDIR /app
 
-# Copy ALL files from your current directory to the /app directory in the container
-# Using "." instead of "/app/" is cleaner because WORKDIR already set the context
+# Copy files to the container
 COPY . .
 
-# Install the dependencies
-# (Since we are in /app, npm will find package.json right here)
-RUN npm install
+# Install dependencies with strict memory limits
+# --jobs 1 reduces parallel processing to save RAM
+RUN npm install --max-old-space-size=512 --jobs 1
 
 # Exposing the port on the container 
 EXPOSE 80
