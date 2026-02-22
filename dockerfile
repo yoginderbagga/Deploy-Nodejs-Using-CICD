@@ -1,17 +1,22 @@
-# Defining the base image 
-FROM node:20-bookworm
+# Defining the base image
+FROM node:20-bookworm 
 
-# Create a working directory inside the container
+# Install the system library needed specifically for mdns2
+RUN apt-get update && apt-get install -y \
+    libavahi-compat-libdnssd-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a working directory
 WORKDIR /app
 
-# Copy files to the container
+# Copy files
 COPY . .
 
-# Install dependencies
-RUN npm install --max-old-space-size=512 --jobs 1
+# Install dependencies 
+RUN npm install --max-old-space-size=512
 
-# Exposing the port on the container 
+# Expose the port
 EXPOSE 80
 
-# Define the command to run the application
+# Run the app
 CMD [ "node", "index.js" ]
