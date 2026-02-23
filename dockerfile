@@ -1,21 +1,25 @@
-# Defining the base image 
-FROM node:20-alpine 
+FROM node:20-bookworm-slim
 
-# 1. Install build tools needed for native modules (like mdns2)
-# We use 'apk' because this is an Alpine-based image
-RUN apk add --no-cache python3 make g++ 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    libavahi-compat-libdnssd-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create a working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy files to the container
-COPY . .
+# Copy EVERYTHING from your current folder to /app
+# We use ./ instead of . to be extra clear
+COPY . ./
 
-# Install dependencies
-RUN npm install --max-old-space-size=512 --jobs 1
+# List files just to be sure (this will show in your logs)
+RUN ls -la
 
-# Exposing the port on the container 
+# Now run install
+RUN npm install --max-old-space-size=450 --jobs 1
+
 EXPOSE 80
-
-# Define the command to run the application
 CMD [ "node", "index.js" ]
